@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Satoshi', sans-serif;
+}
+
+/*
+  Giant ellipse positioned so its top and right edges go outside the viewport.
+  What the user sees: only the left and bottom organic curves — right/top sides
+  appear "glued" to the screen edges because they're clipped by the viewport.
+  transform-origin targets the hamburger button within the blob coordinate space.
+*/
+@keyframes blobExpand {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+.nav-blob-shape {
+  will-change: transform;
+  border-radius: 55% 0 0 48% / 46% 0 0 54%;
+  transform-origin: 90% 8%;
+  animation: blobExpand 0.52s cubic-bezier(0.34, 1.05, 0.64, 1) forwards;
+}
