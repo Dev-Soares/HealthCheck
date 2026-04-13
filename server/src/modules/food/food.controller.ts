@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../../common/guards/auth/auth.guard';
@@ -43,5 +44,10 @@ export class FoodController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.foodService.remove(id);
+  }
+
+  @Get('search')
+  search(@Query('search') name: string) {
+    return this.foodService.search(name);
   }
 }

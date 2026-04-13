@@ -83,4 +83,22 @@ export class FoodService {
       throw new InternalServerErrorException('Erro ao deletar alimento');
     }
   }
+
+  async search(name: string): Promise<FoodPublic[]> {
+    try {
+      return await this.prisma.food.findMany({
+        where: {
+          name: {
+            contains: name,
+            mode: 'insensitive',
+          },
+        },
+        select: foodSelect,
+        orderBy: { name: 'asc' },
+      });
+    } catch {
+      throw new InternalServerErrorException('Erro ao buscar alimentos');
+    }
+  }
+  
 }
