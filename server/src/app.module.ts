@@ -4,6 +4,8 @@ import { DatabaseModule } from './modules/database/database.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
+import { FoodModule } from './modules/food/food.module';
+import { MealModule } from './modules/meal/meal.module';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
@@ -40,6 +42,8 @@ import { LoggerModule } from 'nestjs-pino';
 		UserModule,
 		AuthModule,
 		HealthModule,
+		FoodModule,
+		MealModule,
 		ThrottlerModule.forRoot([
 			{
 				ttl: 60000,

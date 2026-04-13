@@ -4,9 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
 model User {
@@ -14,6 +12,41 @@ model User {
   name      String
   email     String   @unique
   password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  meals     Meal[]
+}
+
+model Food {
+  id        String     @id @default(uuid())
+  name      String
+  calories  Float
+  protein   Float
+  carbs     Float
+  fat       Float
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  mealItems MealItem[]
+}
+
+model Meal {
+  id        String     @id @default(uuid())
+  name      String
+  date      DateTime   @default(now())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     MealItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model MealItem {
+  id        String   @id @default(uuid())
+  quantity  Float
+  mealId    String
+  foodId    String
+  meal      Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  food      Food     @relation(fields: [foodId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
