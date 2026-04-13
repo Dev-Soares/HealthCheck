@@ -85,6 +85,7 @@ export class FoodService {
   }
 
   async search(name: string): Promise<FoodPublic[]> {
+    if (name.length < 2) return [];
     try {
       return await this.prisma.food.findMany({
         where: {
@@ -95,10 +96,11 @@ export class FoodService {
         },
         select: foodSelect,
         orderBy: { name: 'asc' },
+        take: 20,
       });
     } catch {
       throw new InternalServerErrorException('Erro ao buscar alimentos');
     }
   }
-  
+
 }
