@@ -1,4 +1,4 @@
-import { Avocado } from '@phosphor-icons/react'
+
 
 const links = [
   { label: 'Funcionalidades', href: '#funcionalidades' },
@@ -15,10 +15,10 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
           <a href="/" className="flex items-center gap-2.5 w-fit">
-            <div className="w-7 h-7 bg-red-600 rounded-lg flex items-center justify-center">
-              <Avocado size={15} color="white" weight="fill" />
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img src="/logo.png" alt="HealthCheck" className="w-full h-full object-contain" />
             </div>
-            <span className="text-white font-bold text-sm tracking-tight">HealthCheck</span>
+            <span className="text-white text-base tracking-tighter" style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 800 }}>HealthCheck</span>
           </a>
 
           <nav className="flex flex-wrap gap-x-6 gap-y-2">

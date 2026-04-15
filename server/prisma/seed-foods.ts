@@ -1,33 +1,25 @@
-/**
- * seed-foods.ts
- *
- * Fontes:
- *   1. TACO      — 597 alimentos in natura BR (cache local)
- *   2. wger.de   — 16k+ alimentos em português (sem auth, paginado)
- *   3. OFF BR    — industrializados BR (se disponível)
- *
- * Uso:
- *   pnpm --filter app-name-api seed:foods
- */
-
-import dotenv from 'dotenv'
-import { fileURLToPath } from 'node:url'
-import path from 'node:path'
-import fs from 'node:fs'
+import 'dotenv/config'
+import { readFileSync } from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import axios from 'axios'
-import { PrismaClient } from './prisma/client.js'
+import pg from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from './prisma/client.js'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// ─── Prisma Setup ───
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
+const db = new PrismaClient({ adapter })
 
-dotenv.config({ path: path.join(__dirname, '../.env') })
+// ─── Constants ───
+const BATCH_SIZE = 500
+const MAX_RETRIES = 10
+const BASE_DELAY = 15000
+const REQUEST_DELAY = 8000
 
-const db = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
-})
-
-interface FoodData {
+// ─── Interfaces ───
+interface FoodEntry {
   name: string
   calories: number
   protein: number
@@ -35,274 +27,196 @@ interface FoodData {
   fat: number
 }
 
-function sleep(ms: number) {
-  return new Promise<void>((r) => setTimeout(r, ms))
+// ─── Helpers ───
+function round2(val: number): number {
+  return Math.round(val * 100) / 100
 }
 
 function safeNum(val: unknown): number {
-  const n = parseFloat(String(val ?? ''))
-  return isNaN(n) || n < 0 ? 0 : n
+  if (typeof val === 'string') {
+    const trimmed = val.trim()
+    if (trimmed === '' || trimmed === 'NA' || trimmed === 'Tr') return 0
+    const parsed = parseFloat(trimmed)
+    return isNaN(parsed) || parsed < 0 ? 0 : parsed
+  }
+  if (typeof val === 'number') return isNaN(val) || val < 0 ? 0 : val
+  return 0
 }
 
-function normalize(str = '') {
+function normalize(str: string): string {
   return str.trim().toLowerCase()
 }
 
-// ─── 1. TACO ──────────────────────────────────────────────────────────────────
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
-async function loadTaco(): Promise<FoodData[]> {
-  console.log('\n📗 [1/3] Carregando TACO...')
+// ─── Load TACO ───
+function loadTaco(): FoodEntry[] {
+  const __dirname = dirname(fileURLToPath(import.meta.url))
+  const raw = readFileSync(join(__dirname, 'taco.json'), 'utf-8')
+  const items: any[] = JSON.parse(raw)
+  const foods: FoodEntry[] = []
 
-  const localPath = path.join(__dirname, 'taco.json')
+  for (const item of items) {
+    const name = item.description?.trim()
+    if (!name) continue
 
-  if (!fs.existsSync(localPath)) {
-    console.log('  → Baixando de marcelosanto/tabela_taco...')
-    const res = await axios.get(
-      'https://raw.githubusercontent.com/marcelosanto/tabela_taco/main/TACO.json',
-      { timeout: 15000 },
-    )
-    fs.writeFileSync(localPath, JSON.stringify(res.data, null, 2))
-  } else {
-    console.log('  → Usando cache local')
+    const calories = round2(safeNum(item.energy_kcal))
+    const protein = round2(safeNum(item.protein_g))
+    const carbs = round2(safeNum(item.carbohydrate_g))
+    const fat = round2(safeNum(item.lipid_g))
+
+    foods.push({ name, calories, protein, carbs, fat })
   }
 
-  const raw: any[] = JSON.parse(fs.readFileSync(localPath, 'utf-8'))
-
-  const foods = raw
-    .filter((item) => item.description ?? item.nome)
-    .map((item) => ({
-      name: String(item.description ?? item.nome).trim(),
-      calories: safeNum(item.energy_kcal ?? item.energia_kcal ?? item.energia),
-      protein: safeNum(item.protein_g ?? item.proteina),
-      carbs: safeNum(item.carbohydrate_g ?? item.carboidrato),
-      fat: safeNum(item.lipid_g ?? item.lipideos),
-    }))
-
-  console.log(`  ✅ ${foods.length} alimentos`)
+  console.log(`[TACO] ${foods.length} alimentos carregados`)
   return foods
 }
 
-// ─── 2. wger.de (PT) ──────────────────────────────────────────────────────────
-// language=7 → Português | ~16k alimentos | sem auth | sem rate limit declarado
-
-async function loadWger(): Promise<FoodData[]> {
-  console.log('\n📙 [2/3] Carregando wger.de (português)...')
-
-  const foods: FoodData[] = []
-  const PAGE_SIZE = 100
-  let offset = 0
-  let total = 0
-  let page = 1
-
-  while (true) {
-    try {
-      const { data } = await axios.get('https://wger.de/api/v2/ingredient/', {
-        params: { format: 'json', language: 7, limit: PAGE_SIZE, offset },
-        timeout: 15000,
-      })
-
-      if (page === 1) {
-        total = data.count
-        console.log(`  → ${total} alimentos encontrados, paginando...`)
-      }
-
-      for (const item of data.results ?? []) {
-        if (!item.name || item.energy === null) continue
-        foods.push({
-          name: String(item.name).trim(),
-          calories: safeNum(item.energy),
-          protein: safeNum(item.protein),
-          carbs: safeNum(item.carbohydrates),
-          fat: safeNum(item.fat),
-        })
-      }
-
-      process.stdout.write(`\r  → Página ${page}/${Math.ceil(total / PAGE_SIZE)} — ${foods.length} carregados`)
-
-      if (!data.next) break
-
-      offset += PAGE_SIZE
-      page++
-      await sleep(300)
-    } catch (err: any) {
-      console.warn(`\n  ⚠ Erro na página ${page}: ${err.message}`)
-      await sleep(2000)
-      // tenta de novo a mesma página uma vez
-      try {
-        const { data } = await axios.get('https://wger.de/api/v2/ingredient/', {
-          params: { format: 'json', language: 7, limit: PAGE_SIZE, offset },
-          timeout: 15000,
-        })
-        for (const item of data.results ?? []) {
-          if (!item.name || item.energy === null) continue
-          foods.push({
-            name: String(item.name).trim(),
-            calories: safeNum(item.energy),
-            protein: safeNum(item.protein),
-            carbs: safeNum(item.carbohydrates),
-            fat: safeNum(item.fat),
-          })
-        }
-        if (!data.next) break
-        offset += PAGE_SIZE
-        page++
-        await sleep(300)
-      } catch {
-        console.warn(`  ⚠ Página ${page} falhou duas vezes, pulando`)
-        offset += PAGE_SIZE
-        page++
-      }
-    }
-  }
-
-  console.log(`\n  ✅ ${foods.length} alimentos`)
-  return foods
-}
-
-// ─── 3. Open Food Facts (Brasil) ──────────────────────────────────────────────
-
-const OFF_CATEGORIES = [
-  'breakfast-cereals', 'breads', 'dairy', 'yogurts', 'cheeses',
-  'meats', 'processed-meats', 'snacks', 'pasta', 'protein-supplements',
-  'biscuits-and-cakes', 'oils', 'frozen-foods', 'ready-meals',
-  'beverages', 'juices', 'baby-foods', 'chocolate-spreads', 'sauces',
+// ─── OFF Search Terms ───
+const OFF_SEARCH_TERMS = [
+  'arroz', 'feijão', 'macarrão', 'pão', 'leite', 'queijo', 'iogurte', 'manteiga',
+  'ovo', 'frango', 'carne bovina', 'carne suína', 'peixe', 'atum', 'sardinha',
+  'presunto', 'salsicha', 'linguiça', 'bacon', 'mortadela',
+  'banana', 'maçã', 'laranja', 'manga', 'abacaxi', 'melancia', 'uva', 'morango',
+  'tomate', 'cebola', 'alho', 'batata', 'cenoura', 'brócolis', 'alface', 'milho',
+  'farinha', 'açúcar', 'sal', 'óleo', 'azeite', 'vinagre', 'molho de tomate',
+  'chocolate', 'biscoito', 'bolacha', 'bolo', 'sorvete', 'gelatina',
+  'café', 'chá', 'suco', 'refrigerante', 'cerveja', 'vinho',
+  'aveia', 'granola', 'cereal', 'whey protein', 'pasta de amendoim',
+  'castanha', 'amendoim', 'nozes', 'amêndoa',
+  'azeite de oliva', 'óleo de coco', 'margarina',
+  'creme de leite', 'leite condensado', 'requeijão',
+  'peito de frango', 'filé de peixe', 'camarão',
+  'abóbora', 'berinjela', 'pepino', 'pimentão', 'couve', 'espinafre',
+  'lentilha', 'grão de bico', 'ervilha', 'soja',
+  'tapioca', 'cuscuz', 'polenta', 'mandioca',
+  'mel', 'geleia', 'doce de leite',
 ]
 
-async function loadOpenFoodFacts(): Promise<FoodData[]> {
-  console.log('\n📘 [3/3] Carregando Open Food Facts (Brasil)...')
-
-  // Testa disponibilidade antes de tentar
-  try {
-    await axios.get('https://world.openfoodfacts.org/cgi/search.pl', {
-      params: { action: 'process', tagtype_0: 'countries', tag_contains_0: 'contains',
-        tag_0: 'brazil', fields: 'code', json: true, page_size: 1, page: 1 },
-      timeout: 8000,
-    })
-  } catch {
-    console.log('  ⚠ Open Food Facts indisponível — pulando')
-    return []
-  }
-
-  const foods: FoodData[] = []
+// ─── Load Open Food Facts ───
+async function loadOpenFoodFacts(): Promise<FoodEntry[]> {
+  const foods: FoodEntry[] = []
+  const baseUrl = 'https://world.openfoodfacts.org/cgi/search.pl'
+  const totalRequests = OFF_SEARCH_TERMS.length * 2
+  let completed = 0
   let failures = 0
 
-  for (const category of OFF_CATEGORIES) {
-    process.stdout.write(`  → ${category} `)
+  for (const term of OFF_SEARCH_TERMS) {
+    for (let page = 1; page <= 2; page++) {
+      let success = false
 
-    for (let page = 1; page <= 3; page++) {
-      let ok = false
-      for (let attempt = 0; attempt < 2; attempt++) {
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-          const { data } = await axios.get(
-            'https://world.openfoodfacts.org/cgi/search.pl',
-            {
-              params: {
-                action: 'process',
-                tagtype_0: 'countries', tag_contains_0: 'contains', tag_0: 'brazil',
-                tagtype_1: 'categories', tag_contains_1: 'contains', tag_1: category,
-                fields: 'product_name,product_name_pt,nutriments',
-                json: true, page, page_size: 50,
-              },
-              timeout: 15000,
+          const resp = await axios.get(baseUrl, {
+            params: {
+              search_terms: term,
+              search_simple: 1,
+              action: 'process',
+              json: 1,
+              page_size: 50,
+              page,
             },
-          )
+            timeout: 30000,
+          })
 
-          for (const p of data.products ?? []) {
-            const name = p.product_name_pt || p.product_name
+          const products = resp.data?.products ?? []
+          for (const p of products) {
+            const name = p.product_name?.trim()
             if (!name) continue
+
             const n = p.nutriments ?? {}
-            foods.push({
-              name: String(name).trim(),
-              calories: safeNum(n['energy-kcal_100g'] ?? (n['energy_100g'] ?? 0) / 4.184),
-              protein: safeNum(n['proteins_100g']),
-              carbs: safeNum(n['carbohydrates_100g']),
-              fat: safeNum(n['fat_100g']),
-            })
+            const calories = round2(safeNum(n['energy-kcal_100g']))
+            const protein = round2(safeNum(n['proteins_100g']))
+            const carbs = round2(safeNum(n['carbohydrates_100g']))
+            const fat = round2(safeNum(n['fat_100g']))
+
+            if (calories === 0 && protein === 0 && carbs === 0 && fat === 0) continue
+
+            foods.push({ name, calories, protein, carbs, fat })
           }
 
-          ok = true
-          await sleep(1200)
+          success = true
           break
-        } catch {
-          if (attempt === 0) await sleep(3000)
+        } catch (err: any) {
+          const status = err.response?.status
+          if (attempt < MAX_RETRIES && (status === 503 || status === 429 || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT')) {
+            const delay = BASE_DELAY * attempt
+            console.warn(`[OFF] Erro ${status || err.code} ao buscar "${term}" p${page} — tentativa ${attempt}/${MAX_RETRIES}, aguardando ${delay / 1000}s...`)
+            await sleep(delay)
+          } else {
+            console.warn(`[OFF] Falha definitiva ao buscar "${term}" p${page}: ${err.message}`)
+          }
         }
       }
 
-      if (!ok) {
-        failures++
-        if (failures >= 4) {
-          console.log(`\n  ⚠ Muitas falhas — abortando OFF`)
-          console.log(`  ✅ ${foods.length} alimentos`)
-          return foods
-        }
+      if (!success) failures++
+      completed++
+
+      if (completed % 10 === 0) {
+        console.log(`[OFF] Progresso: ${completed}/${totalRequests} requisições (${failures} falhas)`)
       }
+
+      await sleep(REQUEST_DELAY)
     }
-
-    process.stdout.write(`(ok)\n`)
   }
 
-  console.log(`  ✅ ${foods.length} alimentos`)
+  console.log(`[OFF] ${foods.length} alimentos carregados (${failures} requisições falharam de ${totalRequests})`)
   return foods
 }
 
-// ─── Inserção em lotes ────────────────────────────────────────────────────────
-
-async function insertBatch(foods: FoodData[], existingNames: Set<string>) {
-  const seen = new Set<string>()
-
-  const toInsert = foods.filter((f) => {
-    const key = normalize(f.name)
-    if (!f.name || existingNames.has(key) || seen.has(key)) return false
-    seen.add(key)
-    existingNames.add(key) // evita duplicata entre fontes
-    return true
-  })
-
-  const BATCH = 500
+// ─── Insert in Batches ───
+async function insertBatch(foods: FoodEntry[]): Promise<number> {
   let inserted = 0
-  for (let i = 0; i < toInsert.length; i += BATCH) {
-    await db.food.createMany({ data: toInsert.slice(i, i + BATCH) })
-    inserted += Math.min(BATCH, toInsert.length - i)
-    process.stdout.write(`\r  → Inserindo... ${inserted}/${toInsert.length}`)
+
+  for (let i = 0; i < foods.length; i += BATCH_SIZE) {
+    const batch = foods.slice(i, i + BATCH_SIZE)
+    const result = await db.food.createMany({
+      data: batch,
+      skipDuplicates: true,
+    })
+    inserted += result.count
+    console.log(`[DB] Lote ${Math.floor(i / BATCH_SIZE) + 1}: ${result.count} inseridos`)
   }
-  if (toInsert.length > 0) console.log()
+
   return inserted
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
-
+// ─── Main ───
 async function main() {
-  console.log('🌱 Seed — TACO + wger.de PT + Open Food Facts BR')
-  const start = Date.now()
+  console.log('Iniciando seed de alimentos...\n')
 
-  try {
-    const existing = await db.food.findMany({ select: { name: true } })
-    const existingNames = new Set(existing.map((f) => normalize(f.name)))
-    console.log(`\n  → ${existingNames.size} alimentos já no banco`)
+  const tacoFoods = loadTaco()
+  const offFoods = await loadOpenFoodFacts()
 
-    let total = 0
+  // Deduplicate by normalized name
+  const seen = new Set<string>()
+  const allFoods: FoodEntry[] = []
 
-    const taco = await loadTaco()
-    total += await insertBatch(taco, existingNames)
-    console.log(`  → Total inserido até agora: ${existingNames.size} no banco`)
-
-    const wger = await loadWger()
-    total += await insertBatch(wger, existingNames)
-    console.log(`  → Total inserido até agora: ${existingNames.size} no banco`)
-
-    const off = await loadOpenFoodFacts()
-    total += await insertBatch(off, existingNames)
-
-    const elapsed = ((Date.now() - start) / 1000 / 60).toFixed(1)
-    console.log(`\n🎉 Concluído em ${elapsed} min! ${total} novos alimentos inseridos.`)
-    console.log(`   Total no banco: ${existingNames.size} alimentos`)
-  } finally {
-    await db.$disconnect()
+  for (const food of [...tacoFoods, ...offFoods]) {
+    const key = normalize(food.name)
+    if (seen.has(key)) continue
+    seen.add(key)
+    allFoods.push(food)
   }
+
+  console.log(`\n[TOTAL] ${allFoods.length} alimentos únicos (após deduplicação)`)
+
+  // Clear existing foods
+  await db.food.deleteMany()
+  console.log('[DB] Tabela Food limpa')
+
+  const inserted = await insertBatch(allFoods)
+  console.log(`\n✅ Seed concluído: ${inserted} alimentos inseridos no banco`)
 }
 
-main().catch((err) => {
-  console.error('\nErro fatal:', err.message)
-  db.$disconnect()
-  process.exit(1)
-})
+main()
+  .catch((err) => {
+    console.error('Erro fatal no seed:', err)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await db.$disconnect()
+    await pool.end()
+  })

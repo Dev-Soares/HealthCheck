@@ -4,12 +4,6 @@
   --font-sans: 'Satoshi', sans-serif;
 }
 
-/*
-  Giant ellipse positioned so its top and right edges go outside the viewport.
-  What the user sees: only the left and bottom organic curves — right/top sides
-  appear "glued" to the screen edges because they're clipped by the viewport.
-  transform-origin targets the hamburger button within the blob coordinate space.
-*/
 @keyframes blobExpand {
   from { transform: translateX(100%); }
   to   { transform: translateX(0); }
@@ -30,17 +24,27 @@
   to   { opacity: 1; }
 }
 
+@keyframes waveUndulate {
+  0%   { d: path("M 24 0 C 8 8, 0 22, 2 38 C 4 54, 22 58, 20 70 C 16 82, 6 86, 10 94 C 13 97, 16 99, 14 100 L 100 100 L 100 0 Z"); }
+  50%  { d: path("M 20 0 C 12 12, 4 18, 6 34 C 8 50, 18 60, 16 72 C 12 84, 8 88, 12 95 C 14 97, 15 99, 14 100 L 100 100 L 100 0 Z"); }
+  100% { d: path("M 24 0 C 8 8, 0 22, 2 38 C 4 54, 22 58, 20 70 C 16 82, 6 86, 10 94 C 13 97, 16 99, 14 100 L 100 100 L 100 0 Z"); }
+}
+
 .nav-blob-shape {
   will-change: transform;
-  animation: blobExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: blobExpand 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .nav-blob-closing {
-  animation: blobShrink 0.38s cubic-bezier(0.4, 0, 1, 1) forwards;
+  animation: blobShrink 0.5s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
-.nav-link-1 { animation: slideUpFade 0.5s cubic-bezier(0.34, 1.05, 0.64, 1) 330ms both; }
-.nav-link-2 { animation: slideUpFade 0.5s cubic-bezier(0.34, 1.05, 0.64, 1) 400ms both; }
-.nav-link-3 { animation: slideUpFade 0.5s cubic-bezier(0.34, 1.05, 0.64, 1) 470ms both; }
-.nav-cta-enter { animation: slideUpFade 0.5s cubic-bezier(0.34, 1.05, 0.64, 1) 540ms both; }
-.nav-content-fade { animation: fadeIn 0.25s ease-out 290ms both; }
+.nav-blob-wave {
+  animation: waveUndulate 1.5s ease-in-out 1 both;
+}
+
+.nav-link-1 { animation: slideUpFade 0.6s cubic-bezier(0.34, 1.05, 0.64, 1) 500ms both; }
+.nav-link-2 { animation: slideUpFade 0.6s cubic-bezier(0.34, 1.05, 0.64, 1) 600ms both; }
+.nav-link-3 { animation: slideUpFade 0.6s cubic-bezier(0.34, 1.05, 0.64, 1) 700ms both; }
+.nav-cta-enter { animation: slideUpFade 0.6s cubic-bezier(0.34, 1.05, 0.64, 1) 800ms both; }
+.nav-content-fade { animation: fadeIn 0.35s ease-out 450ms both; }

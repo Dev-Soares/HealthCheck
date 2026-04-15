@@ -2,7 +2,6 @@ import Navbar from '@/modules/landing/components/Navbar'
 import Hero from '@/modules/landing/components/Hero'
 import Features from '@/modules/landing/components/Features'
 import HowItWorks from '@/modules/landing/components/HowItWorks'
-import Pricing from '@/modules/landing/components/Pricing'
 import CTA from '@/modules/landing/components/CTA'
 import Footer from '@/modules/landing/components/Footer'
 
@@ -13,7 +12,6 @@ export default function LandingPage() {
       <Hero />
       <Features />
       <HowItWorks />
-      <Pricing />
       <CTA />
       <Footer />
     </main>
