@@ -53,7 +53,16 @@ export default function Hero() {
               </a>
             </div>
 
-          
+            {/* Stats */}
+            <div className="flex flex-wrap gap-8 mt-12 pt-10 border-t border-neutral-100">
+              {stats.map(({ value, label }) => (
+                <div key={label}>
+                  <p className="text-xl font-black text-neutral-950 tracking-tight">{value}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">{label}</p>
+                </div>
+              ))}
+            </div>
+
           </div>
 
           {/* ── Right: App mockup ── */}

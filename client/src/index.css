@@ -11,13 +11,36 @@
   transform-origin targets the hamburger button within the blob coordinate space.
 */
 @keyframes blobExpand {
-  from { transform: scale(0); }
-  to   { transform: scale(1); }
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes blobShrink {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .nav-blob-shape {
   will-change: transform;
-  border-radius: 55% 0 0 48% / 46% 0 0 54%;
-  transform-origin: 90% 8%;
-  animation: blobExpand 0.52s cubic-bezier(0.34, 1.05, 0.64, 1) forwards;
+  animation: blobExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+
+.nav-blob-closing {
+  animation: blobShrink 0.38s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.nav-link-1 { animation: slideUpFade 0.5s cubic-bezier(0.34, 1.05, 0.64, 1) 330ms both; }
+.nav-link-2 { animation: slideUpFade 0.5s cubic-bezier(0.34, 1.05, 0.64, 1) 400ms both; }
+.nav-link-3 { animation: slideUpFade 0.5s cubic-bezier(0.34, 1.05, 0.64, 1) 470ms both; }
+.nav-cta-enter { animation: slideUpFade 0.5s cubic-bezier(0.34, 1.05, 0.64, 1) 540ms both; }
+.nav-content-fade { animation: fadeIn 0.25s ease-out 290ms both; }
