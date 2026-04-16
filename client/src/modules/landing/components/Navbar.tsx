@@ -83,11 +83,11 @@ export default function Navbar() {
 
           {/* ── Nav content ── */}
           <div className="fixed inset-0 z-40 pointer-events-none">
-            <div className={`h-full flex flex-col justify-center pl-[30%] pr-8 md:pr-20 pointer-events-auto transition-opacity duration-150 ${
+             <div className={`h-full flex flex-col justify-around md:justify-center pl-[18%] sm:pl-[22%] md:pl-[26%] lg:pl-[30%] pr-6 sm:pr-8 md:pr-20 pointer-events-auto transition-opacity duration-150 ${
               closing ? 'opacity-0' : 'nav-content-fade'
             }`}>
 
-              <nav className="flex flex-col gap-1">
+              <nav className="flex flex-col gap-1 mt-20 md:mt-0">
                 {navItems.map(({ label, href, icon: Icon }, i) => (
                   <a
                     key={label}
@@ -101,7 +101,7 @@ export default function Navbar() {
                       <Icon size={22} color="white" weight="bold" />
                     </div>
 
-                    <span className="text-white text-4xl lg:text-5xl font-black tracking-tight leading-none group-hover:translate-x-2 transition-transform duration-300">
+                    <span className="text-white text-2xl lg:text-5xl font-black tracking-tight leading-none group-hover:translate-x-2 transition-transform duration-300">
                       {label}
                     </span>
 
@@ -115,7 +115,7 @@ export default function Navbar() {
                 ))}
               </nav>
 
-              <div className={`mt-16 pl-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 ${closing ? '' : 'nav-cta-enter'}`}>
+              <div className={` ml-4 mt-16 pl-5 flex flex-col sm:flex-row items-start gap-4 ${closing ? '' : 'nav-cta-enter'}`}>
                 <a
                   href="/cadastro"
                   className="group bg-white text-red-600 text-sm font-bold px-8 py-3.5 rounded-full hover:bg-neutral-100 hover:shadow-lg hover:shadow-black/10 transition-all duration-200 flex items-center gap-2"

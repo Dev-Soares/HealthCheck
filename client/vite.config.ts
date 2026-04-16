@@ -10,4 +10,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    watch: {
+      awaitWriteFinish: {
+        stabilityThreshold: 100,
+        pollInterval: 10,
+      },
+    },
+  },
 })
