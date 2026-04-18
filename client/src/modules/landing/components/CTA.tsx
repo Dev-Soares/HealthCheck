@@ -103,7 +103,7 @@ export default function CTA() {
             </p>
 
             <a
-              href="/cadastro"
+              href="/create-account"
               className="group inline-flex items-center gap-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold px-8 py-4 rounded-xl transition-all duration-200 text-[15px] cursor-pointer"
             >
               Criar minha conta

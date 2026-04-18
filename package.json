@@ -7,7 +7,9 @@
     "build": "pnpm --filter client build && pnpm --filter server build",
     "start:prod": "pnpm --filter server start:prod",
     "lint": "pnpm -r lint",
-    "format": "prettier --write \"**/*.{ts,tsx,js,json}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,json}\"",
+    "client": "cd client && pnpm run dev",
+    "server": "cd server && pnpm run start:dev"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

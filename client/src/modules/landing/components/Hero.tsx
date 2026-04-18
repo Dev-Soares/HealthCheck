@@ -55,7 +55,7 @@ const Hero = () => {
           {...fadeUp(0.5)}
         >
           <a
-            href="/cadastro"
+            href="/create-account"
             className="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold px-8 py-4 rounded-xl transition-colors duration-150 flex items-center gap-2 text-[15px] cursor-pointer"
           >
             Começar agora
