@@ -1,14 +1,13 @@
 import { ArrowRight } from '@phosphor-icons/react'
 import { motion } from 'framer-motion'
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: (delay: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.34, 1.05, 0.64, 1], delay },
-  }),
-}
+const ease = [0.34, 1.05, 0.64, 1] as const
+
+const fadeUp = (delay: number) => ({
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6, ease, delay },
+})
 
 const Hero = () => {
   return (
@@ -31,10 +30,7 @@ const Hero = () => {
 
         <motion.h1
           className="font-black tracking-tighter leading-[0.88] text-[64px] md:text-[80px] lg:text-[92px] xl:text-[108px] mb-8"
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={0.08}
+          {...fadeUp(0.08)}
         >
           <span className="text-neutral-950">Domine </span>
           <span className="text-neutral-950">cada </span>
@@ -43,18 +39,12 @@ const Hero = () => {
 
         <motion.div
           className="w-14 h-0.75 bg-red-600 mb-8"
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={0.22}
+          {...fadeUp(0.22)}
         />
 
         <motion.p
           className="text-neutral-500 text-[17px] leading-relaxed max-w-105 mb-10"
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={0.36}
+          {...fadeUp(0.36)}
         >
           Rastreie calorias e macros com precisão. Entenda o que você come,
           alcance suas metas e transforme sua relação com a comida.
@@ -62,10 +52,7 @@ const Hero = () => {
 
         <motion.div
           className="flex flex-wrap justify-center gap-4"
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={0.5}
+          {...fadeUp(0.5)}
         >
           <a
             href="/cadastro"
