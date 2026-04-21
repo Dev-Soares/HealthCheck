@@ -1,40 +1,52 @@
-import { useState } from 'react'
-import BlobMenu from '../shared/layouts/BlobMenu'
+import AppLayout from '../shared/layouts/AppLayout'
+import DailySummary from '../modules/home/components/DailySummary'
+import MealList from '../modules/home/components/MealList'
+import type { DailySummary as DailySummaryType } from '../modules/home/types/dailySummary'
+import type { Meal } from '../modules/home/types/meal'
+
+const summary: DailySummaryType = {
+  macros: [
+    { label: 'CALORIAS', value: 1310, max: 2200, unit: 'kcal', color: '#dc2626', trackColor: '#fee2e2' },
+    { label: 'PROTEÍNA', value: 82, max: 150, unit: 'g', color: '#f59e0b', trackColor: '#fef3c7' },
+    { label: 'CARBOS', value: 145, max: 280, unit: 'g', color: '#3b82f6', trackColor: '#dbeafe' },
+    { label: 'GORDURA', value: 48, max: 73, unit: 'g', color: '#a855f7', trackColor: '#f3e8ff' },
+  ],
+}
+
+const meals: Meal[] = [
+  { id: '1', name: 'Café da manhã', mealType: 'breakfast', foods: ['Ovos mexidos', 'Pão integral', 'Café'], time: '07:30', kcal: 420 },
+  { id: '2', name: 'Almoço', mealType: 'lunch', foods: ['Frango grelhado', 'Arroz', 'Feijão', 'Salada'], time: '12:15', kcal: 680 },
+  { id: '3', name: 'Lanche', mealType: 'snack', foods: ['Banana', 'Mix de castanhas'], time: '15:30', kcal: 210 },
+]
 
 export default function MainPage() {
-  const [menuOpen, setMenuOpen] = useState(false)
-
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center px-4 sm:px-6 h-14 sm:h-16 md:h-20">
-        <div className="flex items-center gap-2 sm:gap-3 mt-2 md:mt-0">
-          <img src="/logo.png" alt="" className="w-9 h-9 sm:w-10 sm:h-10 md:w-13 md:h-13 object-contain" />
-          <span
-            className="text-neutral-950 text-base sm:text-lg md:text-2xl tracking-tighter"
-            style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 800 }}
-          >
-            HealthCheck
-          </span>
+    <AppLayout>
+      <div className="px-6 sm:px-10 py-8">
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-base">☀️</span>
+            <span className="text-xs font-bold text-neutral-500 uppercase tracking-widest">Bom dia</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black text-neutral-950 leading-tight tracking-tight">
+            Como está sua{' '}
+            <span className="text-red-600">alimentação</span>{' '}
+            hoje?
+          </h1>
+          <p className="text-sm text-neutral-400 mt-3">
+            {new Date().toLocaleDateString('pt-BR', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+            }).replace(/^\w/, (c) => c.toUpperCase())}
+          </p>
         </div>
-      </header>
 
-      <button
-        onClick={() => setMenuOpen((o) => !o)}
-        className="fixed top-3.5 sm:top-4 md:top-5 right-4 sm:right-5 md:right-6 z-60 flex flex-col gap-1.5 sm:gap-2 cursor-pointer p-2"
-        aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-      >
-        <span className={`block h-0.75 transition-all duration-300 origin-center rounded-full ${
-          menuOpen ? 'w-6 sm:w-7 bg-white rotate-45 translate-y-2.5 sm:translate-y-3' : 'w-6 sm:w-7 bg-neutral-950'
-        }`} />
-        <span className={`block h-0.75 transition-all duration-300 rounded-full ${
-          menuOpen ? 'w-6 sm:w-7 bg-white opacity-0' : 'w-5 sm:w-6 bg-neutral-950'
-        }`} />
-        <span className={`block h-0.75 transition-all duration-300 origin-center rounded-full ${
-          menuOpen ? 'w-6 sm:w-7 bg-white -rotate-45 -translate-y-2.5 sm:-translate-y-3' : 'w-5 sm:w-6 bg-neutral-950'
-        }`} />
-      </button>
-
-      <BlobMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-    </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <DailySummary data={summary} />
+          <MealList meals={meals} />
+        </div>
+      </div>
+    </AppLayout>
   )
 }

@@ -11,9 +11,8 @@ const blobPath = 'M 24 0 C 8 8, 0 22, 2 38 C 4 54, 22 58, 20 70 C 16 82, 6 86, 1
 
 const navItems = [
   { number: '01', label: 'Início', href: '/home' },
-  { number: '02', label: 'Refeições', href: '/meals' },
-  { number: '03', label: 'Alimentos', href: '/foods' },
-  { number: '04', label: 'Perfil', href: '/profile' },
+  { number: '02', label: 'Alimentos', href: '/foods' },
+  { number: '03', label: 'Plano', href: '/plan' },
 ]
 
 export default function BlobMenu({ isOpen, onClose }: BlobMenuProps) {
@@ -92,18 +91,19 @@ export default function BlobMenu({ isOpen, onClose }: BlobMenuProps) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3, delay: 0.5 }}
             >
-              <button
+              <Link
+                to="/login"
                 onClick={onClose}
-                className="text-white/60 hover:text-white text-sm font-bold bg-white/15 hover:bg-white/25 border border-white/30 hover:border-white/50 px-6 py-3.5 rounded-full transition-all duration-200 cursor-pointer"
+                className="text-white/60 hover:text-white text-sm font-bold bg-white/15 hover:bg-white/25 border border-white/30 hover:border-white/50 px-6 py-3.5 rounded-full transition-all duration-200"
               >
                 Sair da conta
-              </button>
+              </Link>
               <Link
-                to="/profile"
+                to="/home"
                 onClick={onClose}
                 className="group bg-white text-red-600 text-sm font-bold px-7 py-3.5 rounded-full hover:bg-neutral-100 transition-all duration-200 flex items-center gap-2"
               >
-                Meu perfil
+                Início
                 <ArrowRight size={15} weight="bold" className="group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
             </motion.div>

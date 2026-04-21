@@ -3,6 +3,8 @@ import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignUpPage from './pages/SignUpPage'
 import MainPage from './pages/MainPage'
+import FoodsPage from './pages/FoodsPage'
+import PlanPage from './pages/PlanPage'
 
 export default function App() {
   return (
@@ -11,6 +13,8 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/create-account" element={<SignUpPage />} />
       <Route path="/home" element={<MainPage />} />
+      <Route path="/foods" element={<FoodsPage />} />
+      <Route path="/plan" element={<PlanPage />} />
     </Routes>
   )
 }
