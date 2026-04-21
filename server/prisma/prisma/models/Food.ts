@@ -445,14 +445,6 @@ export type FoodScalarRelationFilter = {
   isNot?: Prisma.FoodWhereInput
 }
 
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type FoodCreateNestedOneWithoutMealItemsInput = {
   create?: Prisma.XOR<Prisma.FoodCreateWithoutMealItemsInput, Prisma.FoodUncheckedCreateWithoutMealItemsInput>
   connectOrCreate?: Prisma.FoodCreateOrConnectWithoutMealItemsInput

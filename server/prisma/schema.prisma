@@ -14,7 +14,20 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  plan      Plan?
+}
+
+model Plan {
+  id        String   @id @default(uuid())
+  calories  Float
+  protein   Float
+  carbs     Float
+  fat       Float
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   meals     Meal[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Food {
@@ -33,8 +46,8 @@ model Meal {
   id        String     @id @default(uuid())
   name      String
   date      DateTime   @default(now())
-  userId    String
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId    String
+  plan      Plan       @relation(fields: [planId], references: [id], onDelete: Cascade)
   items     MealItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt

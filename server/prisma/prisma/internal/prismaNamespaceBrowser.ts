@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Plan: 'Plan',
   Food: 'Food',
   Meal: 'Meal',
   MealItem: 'MealItem'
@@ -85,6 +86,20 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const PlanScalarFieldEnum = {
+  id: 'id',
+  calories: 'calories',
+  protein: 'protein',
+  carbs: 'carbs',
+  fat: 'fat',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlanScalarFieldEnum = (typeof PlanScalarFieldEnum)[keyof typeof PlanScalarFieldEnum]
+
+
 export const FoodScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -103,7 +118,7 @@ export const MealScalarFieldEnum = {
   id: 'id',
   name: 'name',
   date: 'date',
-  userId: 'userId',
+  planId: 'planId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
