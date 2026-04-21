@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import { readFileSync } from 'fs'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { join } from 'path'
 import axios from 'axios'
 import pg from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
@@ -53,7 +52,6 @@ function sleep(ms: number): Promise<void> {
 
 // ─── Load TACO ───
 function loadTaco(): FoodEntry[] {
-  const __dirname = dirname(fileURLToPath(import.meta.url))
   const raw = readFileSync(join(__dirname, 'taco.json'), 'utf-8')
   const items: any[] = JSON.parse(raw)
   const foods: FoodEntry[] = []

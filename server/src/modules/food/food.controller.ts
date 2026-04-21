@@ -29,6 +29,11 @@ export class FoodController {
     return this.foodService.findAll();
   }
 
+  @Get('search')
+  search(@Query('search') name: string) {
+    return this.foodService.search(name);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.foodService.findOne(id);
@@ -44,10 +49,5 @@ export class FoodController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.foodService.remove(id);
-  }
-
-  @Get('search')
-  search(@Query('search') name: string) {
-    return this.foodService.search(name);
   }
 }
