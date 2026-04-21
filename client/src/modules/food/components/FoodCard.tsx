@@ -18,7 +18,7 @@ export default function FoodCard({ food }: FoodCardProps) {
         />
       </div>
 
-      <p className="text-xs text-neutral-400 mb-3">por 100g</p>
+      <p className="text-xs font-medium text-neutral-500 mb-3">por 100g</p>
 
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex items-center gap-1">

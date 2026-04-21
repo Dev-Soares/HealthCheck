@@ -22,7 +22,7 @@ const meals: Meal[] = [
 export default function MainPage() {
   return (
     <AppLayout>
-      <div className="px-6 sm:px-10 py-8">
+      <div className="px-10 sm:px-16 py-12">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-base">☀️</span>
@@ -33,7 +33,7 @@ export default function MainPage() {
             <span className="text-red-600">alimentação</span>{' '}
             hoje?
           </h1>
-          <p className="text-sm text-neutral-400 mt-3">
+          <p className="text-sm font-medium text-neutral-500 mt-3">
             {new Date().toLocaleDateString('pt-BR', {
               weekday: 'long',
               day: 'numeric',

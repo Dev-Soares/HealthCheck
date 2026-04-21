@@ -14,10 +14,10 @@ export default function MealList({ meals }: MealListProps) {
       <div className="flex items-start justify-between mb-6">
         <div>
           <h2 className="text-base font-bold text-neutral-900">Refeições de hoje</h2>
-          <p className="text-sm text-neutral-400 mt-0.5">Seu histórico do dia</p>
+          <p className="text-sm text-neutral-500 mt-0.5">Seu histórico do dia</p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <span className="text-xs font-bold text-neutral-400 tabular-nums">
+          <span className="text-xs font-bold text-neutral-600 tabular-nums">
             {totalKcal.toLocaleString('pt-BR')} kcal
           </span>
           <button className="flex items-center gap-1 text-sm font-semibold text-red-600 hover:text-red-700 transition-colors">
@@ -33,7 +33,7 @@ export default function MealList({ meals }: MealListProps) {
         ))}
       </div>
 
-      <button className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-neutral-200 text-sm font-semibold text-neutral-400 hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-all duration-200 cursor-pointer">
+      <button className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-neutral-200 text-sm font-semibold text-neutral-500 hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-all duration-200 cursor-pointer">
         <Plus size={15} weight="bold" />
         Adicionar refeição
       </button>

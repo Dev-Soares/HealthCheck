@@ -1,4 +1,4 @@
-import { Sun, ForkKnife, Leaf, Moon, Star, ArrowRight } from '@phosphor-icons/react'
+import { Coffee, ForkKnife, Leaf, Moon, Cookie, ArrowRight } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import type { Meal, MealType } from '../types/meal'
 
@@ -12,7 +12,7 @@ interface MealConfig {
 
 const mealConfig: Record<MealType, MealConfig> = {
   breakfast: {
-    icon: Sun,
+    icon: Coffee,
     label: 'MANHÃ',
     accent: '#ea580c',
     accentLight: '#fed7aa',
@@ -40,7 +40,7 @@ const mealConfig: Record<MealType, MealConfig> = {
     accentText: '#7e22ce',
   },
   supper: {
-    icon: Star,
+    icon: Cookie,
     label: 'CEIA',
     accent: '#475569',
     accentLight: '#cbd5e1',
@@ -77,12 +77,12 @@ export default function MealCard({ meal }: MealCardProps) {
             {config.label}
           </span>
         </div>
-        <p className="text-sm text-neutral-400 truncate">{meal.foods.join(' · ')}</p>
+        <p className="text-sm text-neutral-500 truncate">{meal.foods.join(' · ')}</p>
       </div>
 
       {/* Kcal + time + arrow */}
       <div className="flex items-center gap-4 shrink-0">
-        <span className="text-xs text-neutral-300 font-medium tabular-nums">{meal.time}</span>
+        <span className="text-xs text-neutral-500 font-medium tabular-nums">{meal.time}</span>
         <div className="text-right">
           <p
             className="text-2xl font-black leading-none tabular-nums"
@@ -90,11 +90,11 @@ export default function MealCard({ meal }: MealCardProps) {
           >
             {meal.kcal}
           </p>
-          <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide mt-1">kcal</p>
+          <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wide mt-1">kcal</p>
         </div>
         <ArrowRight
           size={15}
-          className="text-neutral-200 group-hover:text-neutral-400 group-hover:translate-x-0.5 transition-all duration-200"
+          className="text-neutral-300 group-hover:text-neutral-500 group-hover:translate-x-0.5 transition-all duration-200"
         />
       </div>
     </div>

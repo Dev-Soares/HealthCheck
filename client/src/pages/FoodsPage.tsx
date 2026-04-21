@@ -35,7 +35,7 @@ export default function FoodsPage() {
 
   return (
     <AppLayout>
-      <div className="px-4 sm:px-6 py-8 max-w-5xl mx-auto">
+      <div className="px-10 sm:px-16 py-12 max-w-5xl mx-auto">
         <div className="mb-7">
           <h1
             className="text-4xl sm:text-5xl font-black text-neutral-950 tracking-tight leading-none"

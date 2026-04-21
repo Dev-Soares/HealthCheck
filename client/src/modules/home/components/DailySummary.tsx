@@ -25,7 +25,7 @@ function CircularRing({ label, value, max, unit, color, trackColor }: MacroRing)
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
           <span className="text-xl font-black text-neutral-900 leading-none tabular-nums">{displayValue}</span>
-          <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">
+          <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
             {unit === 'kcal' ? 'KCAL' : unit.toUpperCase()}
           </span>
         </div>
@@ -60,7 +60,7 @@ export default function DailySummary({ data }: DailySummaryProps) {
 
       <div className="mb-6">
         <h2 className="text-base font-bold text-neutral-900">Resumo diário</h2>
-        <p className="text-sm text-neutral-400 mt-0.5">Acompanhe seus macros</p>
+        <p className="text-sm text-neutral-500 mt-0.5">Acompanhe seus macros</p>
       </div>
 
       <div className="flex items-start justify-between gap-2 flex-1">
@@ -83,7 +83,7 @@ export default function DailySummary({ data }: DailySummaryProps) {
             style={{ width: `${calPct}%` }}
           />
         </div>
-        <p className="text-[10px] text-neutral-400 mt-1.5">{calPct}% da meta diária consumida</p>
+        <p className="text-xs font-medium text-neutral-500 mt-1.5">{calPct}% da meta diária consumida</p>
       </div>
     </div>
   )

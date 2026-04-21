@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Sun, ForkKnife, Leaf, Moon, Star, CaretDown } from '@phosphor-icons/react'
+import { Plus } from '@phosphor-icons/react'
+import { Coffee, ForkKnife, Leaf, Moon, Cookie, CaretDown } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 
 interface Food {
@@ -27,7 +29,7 @@ interface MealPlan {
 const meals: MealPlan[] = [
   {
     id: 'breakfast',
-    icon: Sun,
+    icon: Coffee,
     label: 'MANHÃ',
     name: 'Café da manhã',
     kcal: 480,
@@ -103,7 +105,7 @@ const meals: MealPlan[] = [
   },
   {
     id: 'supper',
-    icon: Star,
+    icon: Cookie,
     label: 'CEIA',
     name: 'Ceia',
     kcal: 160,
@@ -123,12 +125,13 @@ const meals: MealPlan[] = [
 
 export default function PlanMealsSection() {
   const [openId, setOpenId] = useState<string | null>(null)
+  const navigate = useNavigate()
   const totalKcal = meals.reduce((a, m) => a + m.kcal, 0)
 
   const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id))
 
   return (
-    <div className="px-6 sm:px-10 pb-24">
+    <div className="px-10 sm:px-16 pb-32">
       <div className="flex items-end justify-between mb-6">
         <div>
           <h2
@@ -137,23 +140,33 @@ export default function PlanMealsSection() {
           >
             Refeições
           </h2>
-          <p className="text-sm text-neutral-400 mt-1.5">Distribuição do seu plano ao longo do dia</p>
+          <p className="text-sm text-neutral-500 mt-1.5">Distribuição do seu plano ao longo do dia</p>
         </div>
-        <span className="text-xs font-bold text-neutral-400 tabular-nums hidden sm:block">
-          {meals.length} refeições · {totalKcal.toLocaleString('pt-BR')} kcal total
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-bold text-neutral-500 tabular-nums hidden sm:block">
+            {meals.length} refeições · {totalKcal.toLocaleString('pt-BR')} kcal total
+          </span>
+          <button
+            onClick={() => navigate('/meals/new')}
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors duration-150 cursor-pointer shrink-0"
+          >
+            <Plus size={15} weight="bold" />
+            Nova refeição
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {meals.map((meal) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
+        {meals.map((meal, index) => {
           const MealIcon = meal.icon
           const pct = Math.round((meal.kcal / totalKcal) * 100)
           const isOpen = openId === meal.id
+          const isLastOdd = index === meals.length - 1 && meals.length % 3 === 1
 
           return (
             <div
               key={meal.id}
-              className="bg-white border border-neutral-200 shadow-sm rounded-2xl overflow-hidden transition-shadow duration-200 hover:shadow-md"
+              className={`bg-white border border-neutral-200 shadow-sm rounded-2xl overflow-hidden transition-shadow duration-200 hover:shadow-md ${isLastOdd ? 'xl:col-span-3' : meals.length % 3 === 2 && index === meals.length - 1 ? 'md:col-span-2 xl:col-span-1 xl:col-start-2' : ''}`}
             >
               {/* Card body */}
               <div className="p-5">
@@ -181,7 +194,7 @@ export default function PlanMealsSection() {
                   >
                     {meal.kcal}
                   </span>
-                  <span className="text-lg font-bold text-neutral-300 ml-2">kcal</span>
+                  <span className="text-lg font-bold text-neutral-400 ml-2">kcal</span>
                 </div>
                 <p
                   className="text-base font-bold mb-0.5"
@@ -189,7 +202,7 @@ export default function PlanMealsSection() {
                 >
                   {meal.name}
                 </p>
-                <p className="text-xs text-neutral-400 mb-4">{pct}% do total diário</p>
+                <p className="text-sm font-semibold text-neutral-500 mb-4">{pct}% do total diário</p>
 
                 {/* Macro chips */}
                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -242,7 +255,7 @@ export default function PlanMealsSection() {
                         <div key={food.name} className="flex items-center justify-between px-5 py-3">
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-neutral-800 truncate">{food.name}</p>
-                            <p className="text-xs text-neutral-400 mt-0.5">{food.grams}g</p>
+                            <p className="text-xs font-medium text-neutral-500 mt-0.5">{food.grams}g</p>
                           </div>
                           <span
                             className="text-sm font-black tabular-nums shrink-0 ml-4"

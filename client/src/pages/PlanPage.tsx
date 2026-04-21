@@ -24,7 +24,7 @@ export default function PlanPage() {
 
   return (
     <AppLayout>
-      <div className="px-6 sm:px-10 py-8">
+      <div className="px-10 sm:px-16 py-12">
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
@@ -39,7 +39,7 @@ export default function PlanPage() {
 
           <button
             onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 bg-neutral-950 hover:bg-neutral-800 text-white text-sm font-bold px-5 py-3 rounded-2xl transition-colors duration-200 cursor-pointer shrink-0"
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-3 rounded-2xl transition-colors duration-200 cursor-pointer shrink-0"
           >
             <PencilSimple size={16} weight="bold" />
             Editar plano
@@ -63,7 +63,7 @@ export default function PlanPage() {
                 {plan.dailyKcal.toLocaleString('pt-BR')}
               </span>
             </div>
-            <p className="text-base font-semibold text-neutral-400">kcal por dia</p>
+            <p className="text-base font-semibold text-neutral-500">kcal por dia</p>
 
             <div className="mt-8 h-2 rounded-full bg-red-50 overflow-hidden">
               <div
@@ -72,8 +72,8 @@ export default function PlanPage() {
               />
             </div>
             <div className="flex justify-between mt-2">
-              <span className="text-[10px] text-neutral-400">1.000 kcal</span>
-              <span className="text-[10px] text-neutral-400">5.000 kcal</span>
+              <span className="text-xs font-medium text-neutral-500">1.000 kcal</span>
+              <span className="text-xs font-medium text-neutral-500">5.000 kcal</span>
             </div>
           </div>
 
@@ -92,7 +92,7 @@ export default function PlanPage() {
                     </div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl font-black text-neutral-950 tabular-nums">{value}</span>
-                      <span className="text-sm font-semibold text-neutral-400">g</span>
+                      <span className="text-sm font-semibold text-neutral-500">g</span>
                     </div>
                   </div>
 
@@ -110,7 +110,7 @@ export default function PlanPage() {
       </div>
 
       {/* Divider */}
-      <div className="mx-6 sm:mx-10 border-t border-neutral-100 my-2" />
+      <div className="mx-10 sm:mx-16 border-t border-neutral-100 my-2" />
 
       <PlanMealsSection />
 
