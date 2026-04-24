@@ -46,6 +46,16 @@ function normalize(str: string): string {
   return str.trim().toLowerCase()
 }
 
+function isValidFoodName(name: string): boolean {
+  if (name.length > 70) return false
+  if (name.split(/\s+/).length > 7) return false
+  if (/[%*|#@[\]{}\\<>]/.test(name)) return false
+  if (/\d+(g|ml|kg|l|mg|kcal|cal)\b/i.test(name)) return false
+  if (/^\d/.test(name)) return false
+  if (name === name.toUpperCase() && name.length > 5) return false
+  return true
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -122,7 +132,7 @@ async function loadOpenFoodFacts(): Promise<FoodEntry[]> {
           const products = resp.data?.products ?? []
           for (const p of products) {
             const name = p.product_name?.trim()
-            if (!name) continue
+            if (!name || !isValidFoodName(name)) continue
 
             const n = p.nutriments ?? {}
             const calories = round2(safeNum(n['energy-kcal_100g']))
@@ -188,7 +198,6 @@ async function main() {
   const tacoFoods = loadTaco()
   const offFoods = await loadOpenFoodFacts()
 
-  // Deduplicate by normalized name
   const seen = new Set<string>()
   const allFoods: FoodEntry[] = []
 
@@ -199,9 +208,8 @@ async function main() {
     allFoods.push(food)
   }
 
-  console.log(`\n[TOTAL] ${allFoods.length} alimentos únicos (após deduplicação)`)
+  console.log(`\n[TOTAL] ${allFoods.length} alimentos únicos (após deduplicação e filtros)`)
 
-  // Clear existing foods
   await db.food.deleteMany()
   console.log('[DB] Tabela Food limpa')
 

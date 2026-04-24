@@ -15,12 +15,13 @@ export class MealService {
   constructor(private readonly prisma: PrismaService) {}
 
   private computeTotals(items: MealItemWithFood[]): MealTotals {
+    // Calcula os totais de calorias, proteínas, carboidratos e gorduras com base nos itens da refeição
     return items.reduce(
-      (acc, item) => ({
-        calories: acc.calories + (item.food.calories * item.quantity) / 100,
-        protein: acc.protein + (item.food.protein * item.quantity) / 100,
-        carbs: acc.carbs + (item.food.carbs * item.quantity) / 100,
-        fat: acc.fat + (item.food.fat * item.quantity) / 100,
+      (initial, item) => ({
+        calories: initial.calories + (item.food.calories / 100) * item.quantity,
+        protein: initial.protein + (item.food.protein / 100) * item.quantity,
+        carbs: initial.carbs + (item.food.carbs / 100 ) * item.quantity,
+        fat: initial.fat + (item.food.fat / 100) * item.quantity,
       }),
       { calories: 0, protein: 0, carbs: 0, fat: 0 },
     );

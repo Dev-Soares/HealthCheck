@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/prisma/client';
+import { rankByRelevance, splitSearchWords } from '../../common/utils/search.utils';
 import { PrismaService } from '../database/prisma.service';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { UpdateFoodDto } from './dto/update-food.dto';
@@ -84,20 +85,25 @@ export class FoodService {
     }
   }
 
-  async search(name: string): Promise<FoodPublic[]> {
-    if (name.length < 2) return [];
+  async search(query: string): Promise<FoodPublic[]> {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) return [];
+
+    const words = splitSearchWords(trimmed);
+
     try {
-      return await this.prisma.food.findMany({
+      const results = await this.prisma.food.findMany({
         where: {
-          name: {
-            contains: name,
-            mode: 'insensitive',
-          },
+          AND: words.map((word) => ({
+            name: { contains: word, mode: 'insensitive' },
+          })),
         },
         select: foodSelect,
         orderBy: { name: 'asc' },
-        take: 20,
+        take: 50,
       });
+
+      return rankByRelevance(results, trimmed).slice(0, 20);
     } catch {
       throw new InternalServerErrorException('Erro ao buscar alimentos');
     }
